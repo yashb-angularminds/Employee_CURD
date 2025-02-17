@@ -16,9 +16,9 @@ const userSchema = mongoose.Schema({
     type: String,
     required: true,
   },
-  org:{
-    type:String,
-    required:true
+  org: {
+    type: String,
+    required: true,
   },
   role: {
     type: String,
@@ -51,13 +51,11 @@ userSchema.methods.comparePassword = async function (passwordToBeChecked) {
 };
 
 userSchema.methods.generateAccessToken = function () {
-  console.log("Before generating token ",this);
-  
   return jwt.sign(
     {
       _id: this._id,
       name: this.name,
-      org: this.org
+      org: this.org,
     },
     process.env.ACCESS_TOKEN_SECRET,
     {

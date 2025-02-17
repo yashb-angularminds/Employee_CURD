@@ -2,7 +2,7 @@ const { employeeService } = require("../services/index");
 const asyncHandler = require("../utils/asyncHandler");
 
 const createEmployeeHandler = asyncHandler(async (req, res) => {
-  const employee = await employeeService.createEmployee(req.body, req.user.org);
+  const employee = await employeeService.createEmployee(req.body, req.user);
   res.status(201).json({ message: "Employee created", employee });
 });
 
@@ -30,7 +30,10 @@ const deleteEmployeeHandler = asyncHandler(async (req, res) => {
 });
 
 const getFilteredEmployeesHandler = asyncHandler(async (req, res) => {
-  const result = await employeeService.getFilteredEmployees(req.query);
+  const result = await employeeService.getFilteredEmployees(
+    req.query,
+    req.user._id
+  );
   res.status(200).json(result);
 });
 
