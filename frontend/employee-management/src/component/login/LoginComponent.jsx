@@ -1,10 +1,18 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import loginUser from "../../service/authService";
 import "./login.css";
 import { useNavigate } from "react-router-dom";
 
 function LoginComponent() {
   const navigate = useNavigate();
+  const [token, setToken] = useState(()=>localStorage.getItem("token"));
+
+  useEffect(() => {
+    if (token) {
+      navigate("/dashboard");
+    }
+  }, [token, navigate]);
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -30,6 +38,7 @@ function LoginComponent() {
         password: "",
       });
       localStorage.setItem("token", data.token);
+      setToken(data.token);
       navigate("/dashboard");
     } catch (error) {
       setError(error.message);

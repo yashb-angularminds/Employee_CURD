@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import LoginComponent from "./component/login/LoginComponent";
 import DashboardComponent from "./component/dashboard/DashboardComponent";
+import Protected from "./guards/Protected";
 
 function App() {
   return (
@@ -8,7 +9,14 @@ function App() {
       <Routes>
         <Route path="/" element={<LoginComponent />} />
         <Route path="/login" element={<LoginComponent />} />
-        <Route path="/dashboard" element={<DashboardComponent/>} />
+        <Route
+          path={`Dashboard`}
+          element={
+            <Protected>
+              <DashboardComponent />
+            </Protected>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );

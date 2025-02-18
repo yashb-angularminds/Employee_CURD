@@ -1,28 +1,50 @@
 const API_URL = "http://localhost:5000/employee/";
 
-const getEmployee = async (token) => {
+const getEmployee = async (token, queryParams) => {
   try {
-    const response = await fetch(API_URL, {
+    const queryString = new URLSearchParams(queryParams).toString();
+    console.log(queryString);
+
+    const urlWithParams = `${API_URL}?${queryString}`;
+    const response = await fetch(urlWithParams, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log("Token: ", token);
-
-    console.log(response);
 
     if (!response.ok) {
       throw new Error("Failed to get Employee");
     }
 
-    const data = await response.json();
-    return data;
+    return await response.json();
   } catch (error) {
     console.error("Employee error:", error);
     throw error;
   }
 };
 
-export default getEmployee;
+const addEmployee = async (token,employeeData) => {
+  try {
+    const response = await fetch(`${API_URL}/createEmployee`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(employeeData),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to get Employee");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Employee error:", error);
+    throw error;
+  }
+};
+
+export default { getEmployee, addEmployee };

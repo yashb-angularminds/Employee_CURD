@@ -105,7 +105,7 @@ const getFilteredEmployees = async (query, userId) => {
   }
 
   // Default sorting (by name, ascending)
-  let sortOptions = { name: 1 };
+  let sortOptions = { empId: 1 };
 
   if (sortBy && ["name", "department", "salary"].includes(sortBy)) {
     sortOptions = { [sortBy]: sortOrder === "desc" ? -1 : 1 };
