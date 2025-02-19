@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 function LoginComponent() {
   const navigate = useNavigate();
-  const [token, setToken] = useState(()=>localStorage.getItem("token"));
+  const [token, setToken] = useState(() => localStorage.getItem("token"));
 
   useEffect(() => {
     if (token) {
@@ -83,6 +83,11 @@ function LoginComponent() {
           </button>
         </form>
         {error && <p className="error">{error}</p>}
+        <div className="mt-3 text-center">
+          <p>
+            Dont have account? <a href="/signup">Register Here</a>
+          </p>
+        </div>
       </div>
     </section>
   );

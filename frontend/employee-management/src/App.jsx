@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import LoginComponent from "./component/login/LoginComponent";
 import DashboardComponent from "./component/dashboard/DashboardComponent";
 import Protected from "./guards/Protected";
+import SignupForm from "./component/signup/SignUpForm";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
             </Protected>
           }
         />
+        <Route path="/signup" element={<SignupForm />}></Route>
       </Routes>
     </BrowserRouter>
   );

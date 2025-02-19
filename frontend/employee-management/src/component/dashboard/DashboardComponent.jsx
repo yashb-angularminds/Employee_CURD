@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
 import employeeService from "../../service/employeeService";
 import EmployeeForm from "../employeeForm/EmployeeForm";
-
+import { useNavigate } from "react-router-dom";
 function DashboardComponent() {
+  const navigate = useNavigate();
+  const [userId, setUserId] = useState(null);
   const [employees, setEmployees] = useState([]);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [totalCount, setTotalCount] = useState(0);
   const [queryParams, setqueryParams] = useState({
     department: "",
     sortBy: "",
@@ -21,25 +22,23 @@ function DashboardComponent() {
   const [editEmployee, setEditEmployee] = useState(null);
 
   const token = localStorage.getItem("token");
+  const fetchEmployees = async () => {
+    try {
+      const data = await employeeService.getEmployee(token, queryParams);
+      setEmployees(data.employees);
+      console.log(data);
+      setTotalPages(data.totalPages);
+      setCurrentPage(queryParams.page);
+    } catch (error) {
+      setError(error.message);
+    }
+  };
 
   useEffect(() => {
-    const fetchEmployees = async (page) => {
-      try {
-        const data = await employeeService.getEmployee(token, queryParams);
-        setEmployees(data.employees);
-        console.log(data);
-        setTotalPages(data.totalPages);
-        setTotalCount(data.totalCount);
-        setCurrentPage(queryParams.page);
-      } catch (error) {
-        setError(error.message);
-      }
-    };
-
     if (token) {
       fetchEmployees(currentPage);
     }
-  }, [token, currentPage, queryParams,]);
+  }, [token, currentPage, queryParams]);
 
   const handleFilterChange = (field, value) => {
     setqueryParams((prevParams) => ({
@@ -79,33 +78,56 @@ function DashboardComponent() {
     }
   };
   const handleAddClick = () => {
-    setEditEmployee(null); // Reset values for adding new employee
+    setEditEmployee(null);
     setShowForm(true);
   };
 
-  const handleEditClick = (employee) => {
-    setEditEmployee(employee); // Set values for editing
+  const handleEditClick = (employee, userId) => {
+    setUserId(userId);
+    setEditEmployee(employee);
+    console.log("edit ", userId);
+
     setShowForm(true);
+  };
+  const deleteEmployee = async (id) => {
+    const data = await employeeService.deleteEmployee(token, id);
+    console.log(data);
+    fetchEmployees();
   };
 
   const handleSubmit = async (employeeData) => {
-    if (editEmployee) {
-      console.log("Updating Employee:", employeeData);
-      // Call update API here
-    } else {
-      console.log("Adding Employee:", employeeData);
-      const data = await employeeService.addEmployee(token, employeeData);
-      console.log(data);
+    try {
+      if (editEmployee) {
+        const data = await employeeService.updateEmployee(
+          token,
+          employeeData,
+          userId
+        );
+        console.log(data);
+        setUserId(null);
+      } else {
+        const data = await employeeService.addEmployee(token, employeeData);
+      }
+      fetchEmployees();
+      setShowForm(false);
+    } catch (error) {
+      console.log(error);
+      setShowForm(false);
     }
-    setShowForm(false); // Close form after submit
   };
-  const onCancel = () => {
-    setShowForm(false);
+  const logout = () => {
+    localStorage.removeItem("token");
+    navigate("/login");
   };
 
   return (
     <div className="container mt-5">
-      <h1 className="mb-4">Employee Dashboard </h1>
+      <div className="d-flex justify-content-between align-item-center">
+        <h1 className="mb-4">Employee Dashboard </h1>
+        <button className="h-25 btn btn-info" onClick={logout}>
+          Logout
+        </button>
+      </div>
 
       {/* Search Bar */}
       <div className="mb-3">
@@ -184,22 +206,27 @@ function DashboardComponent() {
         </button>
       </div>
 
-      <div className="d-flex">
+      <div>
         {showForm && (
           <>
             <EmployeeForm
               onSubmit={handleSubmit}
+              onClose={() => setShowForm(false)}
               initialValues={
                 editEmployee || { name: "", department: "", salary: "" }
               }
             />
-            <button
-              onClick={() => {
-                setShowForm(false);
-              }}
-            >
-              Cancel
-            </button>
+            <div className="d-flex justify-content-end mt-2">
+              <button
+                onClick={() => {
+                  setShowForm(false);
+                  setUserId(null);
+                }}
+                className="btn btn-secondary"
+              >
+                Cancel
+              </button>
+            </div>
           </>
         )}
       </div>
@@ -230,20 +257,25 @@ function DashboardComponent() {
                 <button
                   className="btn btn-warning btn-sm mx-1"
                   onClick={() =>
-                    handleEditClick({
-                      name: `${employee.name}`,
-                      department: `${employee.department}`,
-                      salary: `${employee.salary}`,
-                      role: `${employee.role}`,
-                      email: `${employee.email}`,
-                    })
+                    handleEditClick(
+                      {
+                        name: `${employee.name}`,
+                        department: `${employee.department}`,
+                        salary: `${employee.salary}`,
+                        role: `${employee.role}`,
+                        email: `${employee.email}`,
+                      },
+                      employee._id
+                    )
                   }
                 >
                   Update
                 </button>
                 <button
                   className="btn btn-danger btn-sm"
-                  // onClick={() => deleteEmployee(employee.id)}
+                  onClick={() => {
+                    deleteEmployee(employee._id);
+                  }}
                 >
                   Delete
                 </button>
