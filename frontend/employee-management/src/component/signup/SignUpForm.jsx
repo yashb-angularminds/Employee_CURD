@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 export default function SignupForm() {
   const navigate = useNavigate();
+  const [error, setError] = useState(null);
   const [signUpForm, setSignUpForm] = useState({
     name: "",
     email: "",
@@ -21,14 +22,15 @@ export default function SignupForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("")
     try {
       console.log(signUpForm);
 
       const data = await registerUser(signUpForm);
-      alert("Signup Successful!\n");
+
       navigate("/");
     } catch (error) {
-      alert(`Error: ${error}`);
+      setError(error.message);
     }
   };
 
@@ -36,6 +38,8 @@ export default function SignupForm() {
     <div className="container mt-5 d-flex justify-content-center">
       <div className="w-25">
         <h2 className="mb-4">Signup Form</h2>
+        {error && <p className="error text-danger text-center mt-3">{error}</p>}
+
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
             <label className="form-label">Name</label>

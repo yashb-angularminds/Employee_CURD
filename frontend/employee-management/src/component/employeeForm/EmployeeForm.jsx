@@ -1,7 +1,7 @@
 import { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-const EmployeeForm = ({ onSubmit, initialValues, onClose }) => {
+const EmployeeForm = ({ onSubmit, initialValues, onClose, error }) => {
   const [employee, setEmployee] = useState(
     initialValues || {
       name: "",
@@ -11,6 +11,7 @@ const EmployeeForm = ({ onSubmit, initialValues, onClose }) => {
       email: "",
     }
   );
+  console.log("error ih form ", error);
 
   const handleChange = (e) => {
     setEmployee({ ...employee, [e.target.name]: e.target.value });
@@ -28,11 +29,15 @@ const EmployeeForm = ({ onSubmit, initialValues, onClose }) => {
           {/* Modal Header */}
           <div className="modal-header">
             <h5 className="modal-title">Employee Form</h5>
+
             <button
               type="button"
               className="btn-close"
               onClick={onClose}
             ></button>
+          </div>
+          <div className="mb-3 text-center text-danger">
+            {error && <p>{String(error)}</p>}
           </div>
 
           {/* Modal Body */}

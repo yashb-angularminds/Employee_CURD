@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 function LoginComponent() {
   const navigate = useNavigate();
   const [token, setToken] = useState(() => localStorage.getItem("token"));
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (token) {
@@ -17,7 +18,6 @@ function LoginComponent() {
     email: "",
     password: "",
   });
-  const [error, setError] = useState("");
 
   const handleChange = (e) => {
     setFormData({
@@ -29,10 +29,10 @@ function LoginComponent() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    console.log("Login Data:", formData);
+
     try {
       const data = await loginUser(formData);
-      console.log("Login successful:", data);
+
       setFormData({
         email: "",
         password: "",
@@ -82,7 +82,7 @@ function LoginComponent() {
             Login
           </button>
         </form>
-        {error && <p className="error">{error}</p>}
+        {error && <p className="error text-danger text-center mt-3">{error}</p>}
         <div className="mt-3 text-center">
           <p>
             Dont have account? <a href="/signup">Register Here</a>

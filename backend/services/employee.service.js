@@ -65,7 +65,7 @@ const getEmployeeById = async (id) => {
 };
 
 const updateEmployee = async (id, updateData) => {
-  console.log(id, updateData);
+  
 
   const employee = await Employee.findByIdAndUpdate(id, updateData, {
     new: true,

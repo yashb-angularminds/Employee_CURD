@@ -1,8 +1,9 @@
-const API_URL = "http://localhost:5000/auth/login";
+
+import { fetchWithInterceptor } from "../utils/ApiErrorHandling";
 
 const loginUser = async (formData) => {
   try {
-    const response = await fetch(API_URL, {
+    const data = await fetchWithInterceptor("/auth/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -10,16 +11,13 @@ const loginUser = async (formData) => {
       body: JSON.stringify(formData),
     });
 
-    if (!response.ok) {
-      throw new Error("Failed to login. Please try again.");
-    }
-
-    const data = await response.json();
+    console.log("Login Successful:", data);
     return data;
   } catch (error) {
-    console.error("Login error:", error);
+    console.error("Login Error:", error.message);
     throw error;
   }
 };
+
 
 export default loginUser;

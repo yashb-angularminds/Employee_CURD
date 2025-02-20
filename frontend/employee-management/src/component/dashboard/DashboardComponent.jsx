@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import employeeService from "../../service/employeeService";
 import EmployeeForm from "../employeeForm/EmployeeForm";
 import { useNavigate } from "react-router-dom";
+import { set } from "mongoose";
 function DashboardComponent() {
   const navigate = useNavigate();
   const [userId, setUserId] = useState(null);
@@ -24,7 +25,7 @@ function DashboardComponent() {
   const token = localStorage.getItem("token");
   const fetchEmployees = async () => {
     try {
-      const data = await employeeService.getEmployee(token, queryParams);
+      const data = await employeeService.getEmployee(queryParams);
       setEmployees(data.employees);
       console.log(data);
       setTotalPages(data.totalPages);
@@ -90,9 +91,17 @@ function DashboardComponent() {
     setShowForm(true);
   };
   const deleteEmployee = async (id) => {
-    const data = await employeeService.deleteEmployee(token, id);
-    console.log(data);
-    fetchEmployees();
+    const confirmResponse = confirm(
+      "Do you want to delete Employee Permenantly?"
+    );
+    try {
+      if (confirmResponse) {
+        console.log("In response");
+        const data = await employeeService.deleteEmployee(id);
+        console.log(data);
+        fetchEmployees();
+      }
+    } catch (error) {}
   };
 
   const handleSubmit = async (employeeData) => {
@@ -106,13 +115,12 @@ function DashboardComponent() {
         console.log(data);
         setUserId(null);
       } else {
-        const data = await employeeService.addEmployee(token, employeeData);
+        const data = await employeeService.addEmployee(employeeData);
       }
       fetchEmployees();
-      setShowForm(false);
     } catch (error) {
-      console.log(error);
-      setShowForm(false);
+      console.log("In Handle submit", error.message);
+      setError(error.message);
     }
   };
   const logout = () => {
@@ -211,10 +219,14 @@ function DashboardComponent() {
           <>
             <EmployeeForm
               onSubmit={handleSubmit}
-              onClose={() => setShowForm(false)}
+              onClose={() => {
+                setShowForm(false);
+                setError(null);
+              }}
               initialValues={
                 editEmployee || { name: "", department: "", salary: "" }
               }
+              error={error}
             />
             <div className="d-flex justify-content-end mt-2">
               <button
@@ -232,6 +244,7 @@ function DashboardComponent() {
       </div>
 
       {/* Employee List */}
+
       <table className="mt-5 table text-center">
         <thead>
           <tr>
@@ -245,6 +258,14 @@ function DashboardComponent() {
           </tr>
         </thead>
         <tbody>
+          {employees.length === 0 && (
+            <tr>
+              <td colSpan={7} className="text-danger">
+                Employee Not Found
+              </td>
+            </tr>
+          )}
+
           {employees.map((employee) => (
             <tr key={employee.empId}>
               <td>{employee.empId}</td>
@@ -274,7 +295,7 @@ function DashboardComponent() {
                 <button
                   className="btn btn-danger btn-sm"
                   onClick={() => {
-                    deleteEmployee(employee._id);
+                    deleteEmployee(123456);
                   }}
                 >
                   Delete

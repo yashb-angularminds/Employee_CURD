@@ -1,89 +1,86 @@
-const API_URL = "http://localhost:5000/employee/";
+import { fetchWithInterceptor } from "../utils/ApiErrorHandling";
 
-const getEmployee = async (token, queryParams) => {
+const getEmployee = async (queryParams) => {
   try {
+    console.log("In get Employee");
+    console.log("Query Params:", queryParams);
+
     const queryString = new URLSearchParams(queryParams).toString();
-    const urlWithParams = `${API_URL}?${queryString}`;
-    const response = await fetch(urlWithParams, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+    const urlWithParams = `/employee/?${queryString}`;
+    console.log("Final Request URL:", urlWithParams);
+
+    const data = await fetchWithInterceptor(
+      urlWithParams,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
       },
-    });
+      true
+    );
 
-    if (!response.ok) {
-      throw new Error("Failed to get Employee");
-    }
-
-    return await response.json();
+    return data;
   } catch (error) {
-    console.error("Employee error:", error);
     throw error;
   }
 };
 
-const addEmployee = async (token, employeeData) => {
+const addEmployee = async (employeeData) => {
   try {
-    const response = await fetch(`${API_URL}/createEmployee`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+    const data = await fetchWithInterceptor(
+      "/employee/createEmployee",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(employeeData),
       },
-      body: JSON.stringify(employeeData),
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to get Employee");
-    }
-
-    return await response.json();
+      true
+    );
+    return data;
   } catch (error) {
-    console.error("Employee error:", error);
     throw error;
   }
 };
 
-const updateEmployee = async (token, employeeData, id) => {
+const updateEmployee = async (employeeData, id) => {
   try {
-    const response = await fetch(`${API_URL}${id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+    const data = await fetchWithInterceptor(
+      `/employee/${id}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(employeeData),
       },
-      body: JSON.stringify(employeeData),
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to get Employee");
-    }
-
-    return await response.json();
+      true
+    );
+    return data;
   } catch (error) {
-    console.error("Employee error:", error);
     throw error;
   }
 };
 
-const deleteEmployee = async (token, id) => {
+const deleteEmployee = async (id) => {
   try {
-    const response = await fetch(`${API_URL}${id}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+    const data = await fetchWithInterceptor(
+      `/employee/${id}`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
       },
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to get Employee");
-    }
-
-    return await response.json();
+      true
+    );
+    return data;
   } catch (error) {
-    console.error("Employee error:", error);
+    console.log(error);
+
     throw error;
   }
 };
